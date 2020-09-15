@@ -7,7 +7,7 @@ const api = {
     SendSms: '/account/sms',
     SendSmsErr: '/account/sms_err',
     // get my info
-    UserInfo: '/users/info',
+    UserInfo: '/user/info',
     // property-add
     oneStep: '/oneStep'
 }
