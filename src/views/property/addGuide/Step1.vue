@@ -14,7 +14,7 @@
                 :value="index"
                 v-for="(item, index) in select"
                 :key="index"
-              >{{ item }}</a-select-option>
+              >{{ item.companyFullName }}</a-select-option>
             </a-select>
           </a-form-model-item>
         </a-col>
@@ -130,7 +130,8 @@
 
 <script>
 import { oneStep } from '@/api/login'
-
+import { selectCompany, insertCompany } from '@/api/estate'
+const QS = require('qs')
 export default {
     name: 'Step1',
     data() {
@@ -157,36 +158,37 @@ export default {
                         message: '楼宇数量必须填写',
                         trigger: 'change'
                     },
-                    { min: 1, max: 20, type: 'number', message: 'Length should be 3 to 5', trigger: 'change' }
+                    { min: 1, max: 20, type: 'number', message: 'Length should be 1 to 20', trigger: 'change' }
                 ]
             }
         }
     },
     created() {
-        var arr = ['海淀子公司', '海淀子公司', '海淀子公司3', '海淀子公司99']
-        this.select = arr
+        selectCompany().then(res => {
+            this.select = res.result
+        }).catch(err => {
+            this.$notification['error']({
+                message: '错误',
+                description: err.toString(),
+                duration: 1
+            })
+        })
     },
     methods: {
         nextStep() {
             oneStep({ a: 9 })
-            // this.$refs.ruleForm.validate(valid => {
-            //     if (valid) {
-            //         alert('submit!')
-            //         const random = Math.random()
-            //         if (random > 0.5) {
-            //             // this.$emit('nextStep')
-            //         } else {
-            //             this.$notification.error({
-            //                 message: 'error',
-            //                 description: '123',
-            //                 duration: 1
-            //             })
-            //         }
-            //     } else {
-            //         console.log('error submit!!')
-            //         return false
-            //     }
-            // })
+            this.$refs.ruleForm.validate(valid => {
+                if (valid) {
+                    const data = QS.stringify(this.form)
+                    insertCompany(data).then(res => {
+
+                    }).catch(err => {
+
+                    })
+                } else {
+
+                }
+            })
         },
         resetForm() {
             this.$refs.ruleForm.resetFields()
