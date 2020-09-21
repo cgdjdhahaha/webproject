@@ -1,16 +1,16 @@
-import {axios} from '@/utils/request'
+import { axios } from '@/utils/request'
 
-export function selectCompany(){
+export function selectCompany() {
     return axios({
         url: '/estate/selectCompany',
         method: 'get'
     })
 }
 
-export function insertCompany(param){
+export function insertEstate(param) {
     return axios({
-        url: '/estate/insertCompany',
+        url: '/estate/insertEstate',
         method: 'post',
-        message: param
+        data: param
     })
 }
