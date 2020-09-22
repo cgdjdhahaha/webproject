@@ -198,7 +198,8 @@ export default {
                                 })
                             }, 1000)
                             this.$store.commit('SET_TITLE', {
-                                buildingNumber: this.form.buildingNumber
+                                buildingNumber: this.form.buildingNumber,
+                                estateCode: this.form.estateCode
                             })
                             this.$emit('nextStep')
                         } else {

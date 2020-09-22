@@ -14,3 +14,19 @@ export function insertEstate(param) {
         data: param
     })
 }
+
+export function selectBuilding(param) {
+    return axios({
+        url: '/estate/selectBuilding',
+        method: 'post',
+        data: param
+    })
+}
+
+export function updateBuilding(param) {
+    return axios({
+        url: '/estate/updateBuilding',
+        method: 'post',
+        data: param
+    })
+}
