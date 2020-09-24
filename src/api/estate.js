@@ -35,6 +35,28 @@ export function selectUnit(param) {
     return axios({
         url: '/estate/selectUnit',
         method: 'post',
+        data: param,
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+}
+
+export function updateUnit(param) {
+    return axios({
+        url: '/estate/updateUnit',
+        method: 'post',
         data: param
+    })
+}
+
+export function insertCell(param) {
+    return axios({
+        url: '/estate/insertCell',
+        method: 'post',
+        data: param,
+        headers: {
+            'Content-Type': 'application/json'
+        }
     })
 }

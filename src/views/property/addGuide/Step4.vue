@@ -60,6 +60,8 @@
 </template>
 
 <script>
+import { insertCell } from '@/api/estate'
+
 const columns = [
     {
         align: 'center',
@@ -136,6 +138,9 @@ export default {
             columns,
             editingKey: ''
         }
+    },
+    created() {
+        insertCell(this.$store.state.threeStep.cellMessage)
     },
     methods: {
         nextStep() {

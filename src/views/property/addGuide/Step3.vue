@@ -1,25 +1,31 @@
 <template>
-  <div>
-    <!-- <a-form-model ref="ruleForm" :model="form2" :label-col="labelCol" :wrapper-col="wrapperCol"> -->
-    <a-row class="header">
-      楼层数量:
-      <a-input style="width: 30px;padding: 0;text-align: center;"></a-input>开始房号:
-      <!-- <a-form-model-item label="单元数量：" prop="region" class="units" :labelCol="labelCol" :wrapperCol="wrapperCol"> -->
-      <a-select v-model="form2.region">
-        <a-select-option value="1">1</a-select-option>
-        <a-select-option value="2">2</a-select-option>
-      </a-select>结束房号:
-      <!-- <a-form-model-item label="单元数量：" prop="region" class="units" :labelCol="labelCol" :wrapperCol="wrapperCol"> -->
-      <a-select v-model="form2.region">
-        <a-select-option value="1">1</a-select-option>
-        <a-select-option value="2">2</a-select-option>
-      </a-select>
-      <!-- </a-form-model-item> -->
-    </a-row>
-    <a-row>
-      <a-table :columns="columns" :dataSource="data" bordered align="center">
-        <template
-          v-for="col in [
+    <div>
+        <!-- <a-form-model ref="ruleForm" :model="form2" :label-col="labelCol" :wrapper-col="wrapperCol"> -->
+        <a-row class="header">
+            楼层数量:
+            <a-input style="width: 30px;padding: 0;text-align: center;" v-model="form2.floorNumber" @blur="changeFloor"></a-input>开始房号:
+            <!-- <a-form-model-item label="单元数量：" prop="region" class="units" :labelCol="labelCol" :wrapperCol="wrapperCol"> -->
+            <a-select v-model="form2.startCell" @change="changeStartCell">
+                <a-select-option value="1">1</a-select-option>
+                <a-select-option value="2">2</a-select-option>
+                <a-select-option value="3">3</a-select-option>
+                <a-select-option value="4">4</a-select-option>
+                <a-select-option value="5">5</a-select-option>
+            </a-select>结束房号:
+            <!-- <a-form-model-item label="单元数量：" prop="region" class="units" :labelCol="labelCol" :wrapperCol="wrapperCol"> -->
+            <a-select v-model="form2.stopCell" @change="changeStopCell">
+                <a-select-option value="1">1</a-select-option>
+                <a-select-option value="2">2</a-select-option>
+                <a-select-option value="3">3</a-select-option>
+                <a-select-option value="4">4</a-select-option>
+                <a-select-option value="5">5</a-select-option>
+            </a-select>
+            <!-- </a-form-model-item> -->
+        </a-row>
+        <a-row>
+            <a-table :columns="columns" :dataSource="data" bordered align="center">
+                <template
+                    v-for="col in [
             'buildingCode',
             'unitCode',
             'unitName',
@@ -29,44 +35,44 @@
             'stopCellId',
             'remark'
           ]"
-          :slot="col"
-          slot-scope="text, record"
-        >
-          <div :key="col">
-            <a-input
-              v-if="record.editable"
-              style="margin: -5px 0"
-              :value="text"
-              @change="e => handleChange(e.target.value, record.key, col)"
-            />
-            <template v-else>{{ text }}</template>
-          </div>
-        </template>
-        <template slot="operation" slot-scope="text, record">
-          <div class="editable-row-operations">
+                    :slot="col"
+                    slot-scope="text, record"
+                >
+                    <div :key="col">
+                        <a-input
+                            v-if="record.editable"
+                            style="margin: -5px 0"
+                            :value="text"
+                            @change="e => handleChange(e.target.value, record.key, col)"
+                        />
+                        <template v-else>{{ text }}</template>
+                    </div>
+                </template>
+                <template slot="operation" slot-scope="text, record">
+                    <div class="editable-row-operations">
             <span v-if="record.editable">
               <a @click="() => save(record.key)">保存</a>&nbsp;
               <a-popconfirm title="确认取消吗?" @confirm="() => cancel(record.key)">
                 <a>取消</a>
               </a-popconfirm>
             </span>
-            <span v-else>
+                        <span v-else>
               <a :disabled="editingKey !== ''" @click="() => edit(record.key)">编辑</a>
             </span>
-          </div>
-        </template>
-      </a-table>
-      <a-row>
-        <a-button type="primary" @click="nextStep()">下一步</a-button>&nbsp;
-        <a-button type="primary" @click="prevStep()">上一步</a-button>
-      </a-row>
-    </a-row>
-  </div>
+                    </div>
+                </template>
+            </a-table>
+            <a-row>
+                <a-button type="primary" @click="nextStep()">下一步</a-button>&nbsp;
+                <a-button type="primary" @click="prevStep()">上一步</a-button>
+            </a-row>
+        </a-row>
+    </div>
 </template>
 
 <script>
-import { selectUnit } from '@/api/estate'
-
+import { selectUnit, updateUnit } from '@/api/estate'
+const QS = require('qs')
 const columns = [
     {
         align: 'center',
@@ -134,7 +140,6 @@ const columns = [
 ]
 
 const data = []
-
 export default {
     name: 'Step3',
     data() {
@@ -144,6 +149,9 @@ export default {
             form2: {
                 name: '',
                 region: undefined,
+                floorNumber: '',
+                startCell: '',
+                stopCell: '',
                 date1: undefined,
                 delivery: false,
                 type: [],
@@ -156,7 +164,7 @@ export default {
         }
     },
     created() {
-        selectUnit( this.$store.state.twoStep.unitMessage ).then(res => {
+        selectUnit(this.$store.state.twoStep.unitMessage).then(res => {
             const result = res.result
             for (let i = 0; i < result.length; i++) {
                 const unit = result[i]
@@ -169,7 +177,7 @@ export default {
                     stopFloor: unit.stopFloor,
                     startCellId: unit.startCellId,
                     stopCellId: unit.stopCellId,
-                    remark: ''
+                    remark: unit.remark
                 })
             }
             this.cacheData = data.map(item => ({ ...item }))
@@ -181,7 +189,39 @@ export default {
         })
     },
     methods: {
+        changeFloor() {
+            const floorNumber = this.form2.floorNumber
+            for (let i = 0; i < this.data.length; i++) {
+                this.data[i].startFloor = 1
+                this.data[i].stopFloor = floorNumber
+            }
+        },
+        changeStartCell() {
+            const startCell = this.form2.startCell
+            console.log('----' + startCell)
+            for (let i = 0; i < this.data.length; i++) {
+                this.data[i].startCellId = startCell
+            }
+        },
+        changeStopCell() {
+            const stopCell = this.form2.stopCell
+            for (let i = 0; i < this.data.length; i++) {
+                this.data[i].stopCellId = stopCell
+            }
+        },
         nextStep() {
+            const dataArray = this.data
+            var param = '['
+            for (let i = 0; i < dataArray.length; i++) {
+                if (i !== dataArray.length - 1) {
+                    param += '{ "unitCode": "' + dataArray[i].unitCode + '", "startFloor": ' + dataArray[i].startFloor + ', "stopFloor": ' + dataArray[i].stopFloor + ', "startCellId": ' + dataArray[i].startCellId + ', "stopCellId": ' + dataArray[i].stopCellId + '},'
+                } else {
+                    param += '{ "unitCode": "' + dataArray[i].unitCode + '", "startFloor": ' + dataArray[i].startFloor + ', "stopFloor": ' + dataArray[i].stopFloor + ', "startCellId": ' + dataArray[i].startCellId + ', "stopCellId": ' + dataArray[i].stopCellId + '}]'
+                }
+            }
+            this.$store.commit('SET_TITLE', {
+                cellMessage: param
+            })
             this.$emit('nextStep')
         },
         prevStep() {
@@ -217,6 +257,24 @@ export default {
                 this.cacheData = newCacheData
                 this.editingKey = ''
             }
+            // 获取key值
+            target.id = key
+            const param = QS.stringify(target)
+            updateUnit(param).then(res => {
+                setTimeout(() => {
+                    this.$notification.success({
+                        message: '恭喜',
+                        description: res.result
+                    })
+                }, 1000)
+            }).catch(err => {
+                setTimeout(() => {
+                    this.$notification.err({
+                        message: '抱歉',
+                        description: err.result
+                    })
+                }, 1000)
+            })
         },
         cancel(key) {
             const newData = [...this.data]
