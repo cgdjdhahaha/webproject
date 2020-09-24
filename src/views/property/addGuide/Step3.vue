@@ -20,13 +20,13 @@
       <a-table :columns="columns" :dataSource="data" bordered align="center">
         <template
           v-for="col in [
-            'housecode',
-            'unitcode',
-            'unitname',
-            'startfloor',
-            'endfloor',
-            'startroomnum',
-            'endroomnum',
+            'buildingCode',
+            'unitCode',
+            'unitName',
+            'startFloor',
+            'stopFloor',
+            'startCellId',
+            'stopCellId',
             'remark'
           ]"
           :slot="col"
@@ -65,55 +65,57 @@
 </template>
 
 <script>
+import { selectUnit } from '@/api/estate'
+
 const columns = [
     {
         align: 'center',
         title: '楼宇编码',
-        dataIndex: 'housecode',
+        dataIndex: 'buildingCode',
         width: '6%',
-        scopedSlots: { customRender: 'housecode' }
+        scopedSlots: { customRender: 'buildingCode' }
     },
     {
         align: 'center',
         title: '单元编码',
-        dataIndex: 'unitcode',
+        dataIndex: 'unitCode',
         width: '6%',
-        scopedSlots: { customRender: 'unitcode' }
+        scopedSlots: { customRender: 'unitCode' }
     },
     {
         align: 'center',
         title: '单元名称',
-        dataIndex: 'unitname',
+        dataIndex: 'unitName',
         width: '6%',
-        scopedSlots: { customRender: 'unitname' }
+        scopedSlots: { customRender: 'unitName' }
     },
     {
         align: 'center',
         title: '开始楼层',
-        dataIndex: 'startfloor',
+        dataIndex: 'startFloor',
         width: '7%',
-        scopedSlots: { customRender: 'startfloor' }
+        scopedSlots: { customRender: 'startFloor' }
     },
     {
         align: 'center',
         title: '结束楼层',
-        dataIndex: 'endfloor',
+        dataIndex: 'stopFloor',
         width: '7%',
-        scopedSlots: { customRender: 'endfloor' }
+        scopedSlots: { customRender: 'stopFloor' }
     },
     {
         align: 'center',
         title: '开始房号',
-        dataIndex: 'startroomnum',
+        dataIndex: 'startCellId',
         width: '7%',
-        scopedSlots: { customRender: 'startroomnum' }
+        scopedSlots: { customRender: 'startCellId' }
     },
     {
         align: 'center',
         title: '结束房号',
-        dataIndex: 'endroomnum',
+        dataIndex: 'stopCellId',
         width: '7%',
-        scopedSlots: { customRender: 'endroomnum' }
+        scopedSlots: { customRender: 'stopCellId' }
     },
     {
         align: 'center',
@@ -132,23 +134,10 @@ const columns = [
 ]
 
 const data = []
-for (let i = 0; i < 10; i++) {
-    data.push({
-        key: i.toString(),
-        housecode: `B-${i + 1}`,
-        unitcode: `U-${i + 1}`,
-        unitname: `${i + 1}单元`,
-        startfloor: 1,
-        endfloor: 8,
-        startroomnum: 1,
-        endroomnum: 2,
-        remark: ''
-    })
-}
+
 export default {
     name: 'Step3',
     data() {
-        this.cacheData = data.map(item => ({ ...item }))
         return {
             labelCol: { span: 2 },
             wrapperCol: { span: 1 },
@@ -165,6 +154,31 @@ export default {
             columns,
             editingKey: ''
         }
+    },
+    created() {
+        selectUnit( this.$store.state.twoStep.unitMessage ).then(res => {
+            const result = res.result
+            for (let i = 0; i < result.length; i++) {
+                const unit = result[i]
+                data.push({
+                    key: unit.id,
+                    buildingCode: unit.buildingCode,
+                    unitCode: unit.unitCode,
+                    unitName: unit.unitName,
+                    startFloor: unit.startFloor,
+                    stopFloor: unit.stopFloor,
+                    startCellId: unit.startCellId,
+                    stopCellId: unit.stopCellId,
+                    remark: ''
+                })
+            }
+            this.cacheData = data.map(item => ({ ...item }))
+        }).catch(err => {
+            this.$notification.error({
+                message: '失败',
+                description: err.result
+            })
+        })
     },
     methods: {
         nextStep() {

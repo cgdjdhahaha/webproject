@@ -30,3 +30,11 @@ export function updateBuilding(param) {
         data: param
     })
 }
+
+export function selectUnit(param) {
+    return axios({
+        url: '/estate/selectUnit',
+        method: 'post',
+        data: param
+    })
+}

@@ -6,6 +6,7 @@ import user from './modules/user'
 // default router permission control
 import permission from './modules/permission'
 import oneStep from '@/store/modules/oneStep'
+import twoStep from '@/store/modules/twoStep'
 // dynamic router permission control (Experimental)
 // import permission from './modules/async-router'
 import getters from './getters'
@@ -17,7 +18,8 @@ export default new Vuex.Store({
         app,
         user,
         permission,
-        oneStep
+        oneStep,
+        twoStep
     },
     state: {
 
