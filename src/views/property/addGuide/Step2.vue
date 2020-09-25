@@ -152,7 +152,6 @@ const data = []
 export default {
     name: 'Step2',
     data() {
-        this.cacheData = data.map(item => ({ ...item }))
         return {
             labelCol: { span: 2 },
             wrapperCol: { span: 1 },
@@ -183,9 +182,10 @@ export default {
         const parameter = QS.stringify(sendData)
         selectBuilding(parameter).then(res => {
             const result = res.result
+            const myData = []
             for (let i = 0; i < result.length; i++) {
                 const building = result[i]
-                data.push({
+                myData.push({
                     key: building.id,
                     buildingCode: building.buildingCode,
                     buildingName: building.buildingName,
@@ -198,8 +198,9 @@ export default {
                     usedArea: building.usedArea,
                     remark: building.remark
                 })
-                this.cacheData = data.map(item => ({ ...item }))
             }
+            this.data = myData
+            this.cacheData = this.data.map(item => ({ ...item }))
         }).catch(err => {
             this.$notification.error({
                 message: '抱歉',
@@ -225,7 +226,8 @@ export default {
                 }
             }
             this.$store.commit('SET_TITLE', {
-                unitMessage: param
+                unitMessage: param,
+                estateCode: this.$store.state.oneStep.estateCode
             })
             this.$emit('nextStep')
         },
@@ -273,10 +275,12 @@ export default {
                     })
                 }, 1000)
             }).catch(err => {
-                this.$notification.error({
-                    message: '抱歉',
-                    description: err.result
-                })
+                setTimeout(() => {
+                    this.$notification.err({
+                        message: '抱歉',
+                        description: err.result
+                    })
+                }, 1000)
             })
         },
         cancel(key) {

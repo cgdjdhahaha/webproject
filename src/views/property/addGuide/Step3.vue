@@ -220,7 +220,8 @@ export default {
                 }
             }
             this.$store.commit('SET_TITLE', {
-                cellMessage: param
+                cellMessage: param,
+                estateCode: this.$store.state.twoStep.estateCode
             })
             this.$emit('nextStep')
         },

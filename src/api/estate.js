@@ -60,3 +60,11 @@ export function insertCell(param) {
         }
     })
 }
+
+export function selectBuildingByEstate(param) {
+    return axios({
+        url: '/estate/selectBuildingByEstate',
+        method: 'post',
+        data: param
+    })
+}
