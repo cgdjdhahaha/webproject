@@ -11,7 +11,7 @@
           >
             <a-select v-model="form.company">
               <a-select-option
-                :value="index"
+                :value="item.id"
                 v-for="(item, index) in select"
                 :key="index"
               >{{ item.companyFullName }}</a-select-option>

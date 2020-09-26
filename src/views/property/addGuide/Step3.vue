@@ -166,9 +166,10 @@ export default {
     created() {
         selectUnit(this.$store.state.twoStep.unitMessage).then(res => {
             const result = res.result
+            const myData = []
             for (let i = 0; i < result.length; i++) {
                 const unit = result[i]
-                data.push({
+                myData.push({
                     key: unit.id,
                     buildingCode: unit.buildingCode,
                     unitCode: unit.unitCode,
@@ -180,7 +181,8 @@ export default {
                     remark: unit.remark
                 })
             }
-            this.cacheData = data.map(item => ({ ...item }))
+            this.data = myData
+            this.cacheData = this.data.map(item => ({ ...item }))
         }).catch(err => {
             this.$notification.error({
                 message: '失败',

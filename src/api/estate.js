@@ -68,3 +68,27 @@ export function selectBuildingByEstate(param) {
         data: param
     })
 }
+
+export function selectUnitByBuildingCode(param) {
+    return axios({
+        url: '/estate/selectUnitByBuildingCode',
+        method: 'post',
+        data: param
+    })
+}
+
+export function selectCellByUnitCode(param) {
+    return axios({
+        url: '/estate/selectCellByUnitCode',
+        method: 'post',
+        data: param
+    })
+}
+
+export function selectEstate(param) {
+    return axios({
+        url: '/estate/selectEstate',
+        method: 'post',
+        data: param
+    })
+}

@@ -3,14 +3,15 @@
     <!-- <a-form-model ref="ruleForm" :model="form2" :label-col="labelCol" :wrapper-col="wrapperCol"> -->
     <a-row class="header">
       选择楼宇:
-      <a-select v-model="form2.building">
+      <a-select v-model="form2.building" @change="changeBuilding">
         <a-select-option :key="index" :value="item.buildingCode" v-for="(item, index) in buildingSelect">
             {{ item.buildingName }}
         </a-select-option>
       </a-select>选择单元:
-      <a-select v-model="form2.unit">
-        <a-select-option value="1">1</a-select-option>
-        <a-select-option value="2">2</a-select-option>
+      <a-select v-model="form2.unit" @change="changeCell">
+          <a-select-option :key="index" :value="item.unitCode" v-for="(item, index) in unitSelect">
+              {{ item.unitName }}
+          </a-select-option>
       </a-select>建筑面积:
       <a-input style="width: 40px;padding: 0;text-align: center;"></a-input>使用面积:
       <a-input style="width: 40px;padding: 0;text-align: center;"></a-input>
@@ -63,7 +64,7 @@
 </template>
 
 <script>
-import { insertCell, selectBuildingByEstate } from '@/api/estate'
+import { insertCell, selectBuildingByEstate, selectUnitByBuildingCode, selectCellByUnitCode } from '@/api/estate'
 const QS = require('qs')
 const columns = [
     {
@@ -146,15 +147,18 @@ export default {
             data,
             columns,
             editingKey: '',
-            buildingSelect: []
+            buildingSelect: [],
+            unitSelect: '',
+            unitCell: ''
         }
     },
     created() {
         insertCell(this.$store.state.threeStep.cellMessage).then(res => {
             const result = res.result
+            const myData = []
             for (let i = 0; i < result.length; i++) {
                 const cell = result[i]
-                data.push({
+                myData.push({
                     key: cell.id,
                     floorNumber: cell.floorNumber,
                     unitCode: cell.unitCode,
@@ -165,14 +169,41 @@ export default {
                     remark: cell.remark
                 })
             }
-            this.cacheData = data.map(item => ({ ...item }))
+            this.data = myData
+            this.cacheData = this.data.map(item => ({ ...item }))
         })
-        selectBuildingByEstate(QS.stringify({ estateCode: this.$store.state.threeStep.estateCode})).then(res => {
-            console.log('result:' +  res.result)
+        selectBuildingByEstate(QS.stringify({ estateCode: this.$store.state.threeStep.estateCode })).then(res => {
+            console.log('result:' + res.result)
             this.buildingSelect = res.result
         })
     },
     methods: {
+        changeCell() {
+            selectCellByUnitCode(QS.stringify({ unitCode: this.form2.unit })).then(res => {
+                const result = res.result
+                const myData = []
+                for (let i = 0; i < result.length; i++) {
+                    const cell = result[i]
+                    myData.push({
+                        key: cell.id,
+                        floorNumber: cell.floorNumber,
+                        unitCode: cell.unitCode,
+                        cellCode: cell.cellCode,
+                        cellName: cell.cellName,
+                        cellBuildArea: cell.cellBuildArea,
+                        cellUsedArea: cell.cellUsedArea,
+                        remark: cell.remark
+                    })
+                }
+                this.data = myData
+                this.cacheData = this.data.map(item => ({ ...item }))
+            })
+        },
+        changeBuilding() {
+          selectUnitByBuildingCode(QS.stringify({ buildingCode: this.form2.building })).then(res => {
+              this.unitSelect = res.result
+          })
+        },
         nextStep() {
             this.$emit('nextStep')
             console.log(33)
